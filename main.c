@@ -45,6 +45,7 @@ uint32_t qavg_period = APP_QAVG_PERIOD;
 uint32_t qavg_ntimes = APP_QAVG_NTIMES;
 
 /* main processing loop */
+/*avoid to produce warning*/
 static int
 app_main_loop(__attribute__((unused))void *dummy)
 {
@@ -61,7 +62,7 @@ app_main_loop(__attribute__((unused))void *dummy)
 	memset(wt_confs, 0, sizeof(wt_confs));
 	memset(tx_confs, 0, sizeof(tx_confs));
 
-
+/*set flow conf*/
 	mode = APP_MODE_NONE;
 	lcore_id = rte_lcore_id();
 
@@ -279,10 +280,18 @@ main(int argc, char **argv)
 {
 	int ret;
 
+	/*use argc to write configuration data
+	to set port rx tx core thread
+	to set ring configuration
+	to set burst configuration
+	use parse flow interface to set qos_conf*/
 	ret = app_parse_args(argc, argv);
 	if (ret < 0)
 		return -1;
 
+	/*init socket's tx/rx ring
+	init pktmbuf pool per socket
+	init qos_conf info*/
 	ret = app_init();
 	if (ret < 0)
 		return -1;

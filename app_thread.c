@@ -81,10 +81,12 @@ app_rx_thread(struct thread_conf **confs)
 		uint64_t cycStartTotal = rte_get_tsc_cycles();
 		#endif
 
+/*using rx_mbufs to receive burst packets*/
 		nb_rx = rte_eth_rx_burst(conf->rx_port, conf->rx_queue, rx_mbufs,
 				burst_conf.rx_burst);
 
 		if (likely(nb_rx != 0)) {
+			/*add stats*/
 			APP_STATS_ADD(conf->stat.nb_rx, nb_rx);
 						
 			#ifdef QOSSTATS
@@ -92,8 +94,10 @@ app_rx_thread(struct thread_conf **confs)
 			#endif
 
 			for(i = 0; i < nb_rx; i++) {
+				/*use packet header to set qos policer, to write subport ... info*/
 				get_pkt_sched(rx_mbufs[i],
 						&subport, &pipe, &traffic_class, &queue, &color);
+				/*set scheduler hierarchy in packet classfication stage*/
 				rte_sched_port_pkt_write(conf->sched_port,
 						rx_mbufs[i],
 						subport, pipe,
@@ -109,6 +113,7 @@ app_rx_thread(struct thread_conf **confs)
 			}
 			#endif
 
+			/*enqueue several objects to a ring*/
 			if (unlikely(rte_ring_sp_enqueue_bulk(conf->rx_ring,
 					(void **)rx_mbufs, nb_rx, NULL) == 0)) {
 				for(i = 0; i < nb_rx; i++) {
@@ -192,6 +197,7 @@ app_tx_thread(struct thread_conf **confs)
 	const uint64_t drain_tsc = (rte_get_tsc_hz() + US_PER_S - 1) / US_PER_S * BURST_TX_DRAIN_US;
 
 	while ((conf = confs[conf_idx])) {
+		/*dequeue packets from ring*/
 		retval = rte_ring_sc_dequeue_bulk(conf->tx_ring, (void **)mbufs,
 					burst_conf.qos_dequeue, NULL);
 		if (likely(retval != 0)) {

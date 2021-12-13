@@ -108,6 +108,7 @@ app_init_port(uint16_t portid, struct rte_mempool *mp)
 	if (dev_info.tx_offload_capa & DEV_TX_OFFLOAD_MBUF_FAST_FREE)
 		local_port_conf.txmode.offloads |=
 			DEV_TX_OFFLOAD_MBUF_FAST_FREE;
+		/*configure port 1 rx 1 tx*/
 	ret = rte_eth_dev_configure(portid, 1, 1, &local_port_conf);
 	if (ret < 0)
 		rte_exit(EXIT_FAILURE,
@@ -116,6 +117,7 @@ app_init_port(uint16_t portid, struct rte_mempool *mp)
 
 	rx_size = ring_conf.rx_size;
 	tx_size = ring_conf.tx_size;
+	/*set rx tx desc */
 	ret = rte_eth_dev_adjust_nb_rx_tx_desc(portid, &rx_size, &tx_size);
 	if (ret < 0)
 		rte_exit(EXIT_FAILURE,
@@ -153,7 +155,7 @@ app_init_port(uint16_t portid, struct rte_mempool *mp)
 
 	printf("done: ");
 
-	/* get link status */
+	/* get link status ,can use no_wait()*/
 	ret = rte_eth_link_get(portid, &link);
 	if (ret < 0)
 		rte_exit(EXIT_FAILURE,
@@ -301,6 +303,7 @@ app_init_sched_port(uint32_t portid, uint32_t socketid)
 	uint32_t pipe, subport;
 	int err;
 
+/*can be replace by rte_eth_link_get_nowait()*/
 	err = rte_eth_link_get(portid, &link);
 	if (err < 0)
 		rte_exit(EXIT_FAILURE,
@@ -312,11 +315,13 @@ app_init_sched_port(uint32_t portid, uint32_t socketid)
 	snprintf(port_name, sizeof(port_name), "port_%d", portid);
 	port_params.name = port_name;
 
+/*config qos，config port*/
 	port = rte_sched_port_config(&port_params);
 	if (port == NULL){
 		rte_exit(EXIT_FAILURE, "Unable to config sched port\n");
 	}
 
+/*config subport,pipe*/
 	for (subport = 0; subport < port_params.n_subports_per_port; subport ++) {
 		err = rte_sched_subport_config(port, subport, &subport_params[subport]);
 		if (err) {

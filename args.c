@@ -323,7 +323,7 @@ app_parse_args(int argc, char **argv)
 	};
 
 	/* initialize EAL first */
-	ret = rte_eal_init(argc, argv);
+	ret = rte_eal_init(argc, argv);[]
 	if (ret < 0)
 		return -1;
 

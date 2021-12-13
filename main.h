@@ -138,9 +138,9 @@ extern uint8_t interactive;
 extern uint32_t qavg_period;
 extern uint32_t qavg_ntimes;
 extern uint32_t nb_pfc;
-extern const char *cfg_profile;
+extern const char *;
 extern int mp_size;
-extern struct flow_conf qos_conf[];
+extern struct flow_conf [];
 extern int app_pipe_to_profile[MAX_SCHED_SUBPORTS][MAX_SCHED_PIPES];
 
 extern struct ring_conf ring_conf;
