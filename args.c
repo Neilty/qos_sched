@@ -275,7 +275,7 @@ app_parse_flow_conf(const char *conf_str)
 
 	mask = 1lu << pconf->tx_core;
 	app_used_core_mask |= mask;
-
+    /*nb_pfc is number of packet flow config*/
 	nb_pfc++;
 
 	return 0;
