@@ -216,12 +216,13 @@ app_parse_flow_conf(const char *conf_str)
 	uint64_t mask;
 
 	memset(vals, 0, sizeof(vals));
+    /*parse conf_str into vals which 0 0 27 71*/
 	ret = app_parse_opt_vals(conf_str, ',', 6, vals);
 	if (ret < 4 || ret > 5)
 		return ret;
 
 	pconf = &qos_conf[nb_pfc];
-
+    /*using vals set qos_conf port info*/
 	pconf->rx_port = vals[0];
 	pconf->tx_port = vals[1];
 	pconf->rx_core = (uint8_t)vals[2];
@@ -229,6 +230,7 @@ app_parse_flow_conf(const char *conf_str)
 	if (ret == 5)
 		pconf->tx_core = (uint8_t)vals[4];
 	else
+        /*tx_core is same as wt_core*/
 		pconf->tx_core = pconf->wt_core;
 
 	if (pconf->rx_core == pconf->wt_core) {
@@ -246,7 +248,7 @@ app_parse_flow_conf(const char *conf_str)
 				nb_pfc, pconf->tx_port);
 		return -1;
 	}
-
+    /*mask port as used*/
 	mask = 1lu << pconf->rx_port;
 	if (app_used_rx_port_mask & mask) {
 		RTE_LOG(ERR, APP, "pfc %u: rx port %"PRIu16" is used already\n",
@@ -304,12 +306,30 @@ app_parse_burst_conf(const char *conf_str)
 int
 app_parse_args(int argc, char **argv)
 {
+/* * Usage:
+ *    1) Example run command: ./build/qos_sched -l 26,27,71 -w 0000:83:00.0 -- --pfc "0,0,27,71" --cfg profile.cfg --mst 26
+ *    the total argc is 12
+ *    the 1th arg is ./build/qos_sched
+ *    the 2th arg is -l
+*     the 3th arg is 26,27,71
+*     the 4th arg is -w
+*     the 5th arg is 0000:83:00.0
+*     the 6th arg is --
+*     the 7th arg is --pfc
+*     the 8th arg is 0,0,27,71
+*     the 9th arg is --cfg
+*     the 10th arg is profile.cfg
+*     the 11th arg is --mst
+*     the 12th arg is 26
+ *    */
 	int opt, ret;
 	int option_index;
 	const char *optname;
 	char *prgname = argv[0];
 	uint32_t i, nb_lcores;
 
+   /* int getopt_long(int argc, char *const argv[], const char *optstring, const struct option *longopts, 
+    * int *longindex);*/
 	static struct option lgopts[] = {
 		{ "pfc", 1, 0, 0 },
 		{ "mst", 1, 0, 0 },
@@ -322,7 +342,9 @@ app_parse_args(int argc, char **argv)
 		{ NULL,  0, 0, 0 }
 	};
 
-	/* initialize EAL first */
+	/* initialize EAL first
+     * on success return number of args
+     * on failure return -1 */
 	ret = rte_eal_init(argc, argv);[]
 	if (ret < 0)
 		return -1;
@@ -333,6 +355,12 @@ app_parse_args(int argc, char **argv)
 	/* set en_US locale to print big numbers with ',' */
 	setlocale(LC_NUMERIC, "en_US.utf-8");
 
+    /*
+     * struct option{
+     * const char *name;
+     * int has_arg; 0 stands for no_arg, 1 stands for need args
+     * int *flag; if *flag equals 0, getopt_long return the value of val; if not,return 0 and *flag = val
+     * int val;}*/
 	while ((opt = getopt_long(argc, argv, "i",
 		lgopts, &option_index)) != EOF) {
 
@@ -345,6 +373,7 @@ app_parse_args(int argc, char **argv)
 			case 0:
 				optname = lgopts[option_index].name;
 				if (str_is(optname, "pfc")) {
+                    /*each optarg means arg number,in this optargs is 0,0,27,71*/
 					ret = app_parse_flow_conf(optarg);
 					if (ret) {
 						RTE_LOG(ERR, APP, "Invalid pipe configuration %s\n", optarg);
