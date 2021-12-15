@@ -187,6 +187,8 @@ app_send_packets(struct thread_conf *qconf, struct rte_mbuf **mbufs, uint32_t nb
 	qconf->n_mbufs = len;
 }
 
+/*get packets from tx_ring
+ * send packets to tx_port*/
 void
 app_tx_thread(struct thread_conf **confs)
 {
