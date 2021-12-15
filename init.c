@@ -81,6 +81,7 @@ app_init_port(uint16_t portid, struct rte_mempool *mp)
 	if (app_inited_port_mask & (1u << portid))
 		return 0;
 
+    /*init rx configure*/
 	rx_conf.rx_thresh.pthresh = rx_thresh.pthresh;
 	rx_conf.rx_thresh.hthresh = rx_thresh.hthresh;
 	rx_conf.rx_thresh.wthresh = rx_thresh.wthresh;
@@ -88,6 +89,7 @@ app_init_port(uint16_t portid, struct rte_mempool *mp)
 	rx_conf.rx_drop_en = 0;
 	rx_conf.rx_deferred_start = 0;
 
+    /*init tx configure*/
 	tx_conf.tx_thresh.pthresh = tx_thresh.pthresh;
 	tx_conf.tx_thresh.hthresh = tx_thresh.hthresh;
 	tx_conf.tx_thresh.wthresh = tx_thresh.wthresh;
@@ -115,6 +117,7 @@ app_init_port(uint16_t portid, struct rte_mempool *mp)
 			 "Cannot configure device: err=%d, port=%u\n",
 			 ret, portid);
 
+    /*global rx/tx size*/
 	rx_size = ring_conf.rx_size;
 	tx_size = ring_conf.tx_size;
 	/*set rx tx desc */
@@ -372,6 +375,7 @@ int app_init(void)
 	char ring_name[MAX_NAME_LEN];
 	char pool_name[MAX_NAME_LEN];
 
+    /*get the avail eth_device the app can use*/
 	if (rte_eth_dev_count_avail() == 0)
 		rte_exit(EXIT_FAILURE, "No Ethernet port - bye\n");
 
@@ -381,6 +385,7 @@ int app_init(void)
 
 	/* Initialize each active flow */
 	for(i = 0; i < nb_pfc; i++) {
+        /*create ring on socket*/
 		uint32_t socket = rte_lcore_to_socket_id(qos_conf[i].rx_core);
 		struct rte_ring *ring;
 

@@ -226,6 +226,10 @@ app_tx_thread(struct thread_conf **confs)
 }
 
 
+/*receive packets from rx_ring
+ * enqueue packets to sched_port
+ * get packet from sched_port
+ * send packets to tx_ring*/
 void
 app_worker_thread(struct thread_conf **confs)
 {
@@ -261,6 +265,7 @@ app_worker_thread(struct thread_conf **confs)
 }
 
 
+/**/
 void
 app_mixed_thread(struct thread_conf **confs)
 {
@@ -291,6 +296,7 @@ app_mixed_thread(struct thread_conf **confs)
 			uint64_t cycStartEn = rte_get_tsc_cycles();
 			#endif
 			
+            /*send packet to sched*/
 			int nb_sent = rte_sched_port_enqueue(conf->sched_port, mbufs,
 					nb_pkt);
 			
@@ -311,6 +317,7 @@ app_mixed_thread(struct thread_conf **confs)
 		uint64_t cycStartDe = rte_get_tsc_cycles();
 		#endif
 
+        /*dequeue packet from sched port*/
 		nb_pkt = rte_sched_port_dequeue(conf->sched_port, mbufs,
 					burst_conf.qos_dequeue);
 		

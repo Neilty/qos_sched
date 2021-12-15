@@ -373,7 +373,8 @@ app_parse_args(int argc, char **argv)
 			case 0:
 				optname = lgopts[option_index].name;
 				if (str_is(optname, "pfc")) {
-                    /*each optarg means arg number,in this optargs is 0,0,27,71*/
+                    /*each optarg means arg number,in this optargs is 0,0,27,71
+                     * use 0,0,27,71 set qos_conf,set nb_pfc*/
 					ret = app_parse_flow_conf(optarg);
 					if (ret) {
 						RTE_LOG(ERR, APP, "Invalid pipe configuration %s\n", optarg);

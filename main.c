@@ -119,6 +119,7 @@ app_main_loop(__attribute__((unused))void *dummy)
 					i, lcore_id, rx_confs[i]->rx_port);
 		}
 
+        /*receive packet and send to qos framework*/
 		app_rx_thread(rx_confs);
 	}
 	else if (mode == (APP_TX_MODE | APP_WT_MODE)) {
@@ -291,7 +292,11 @@ main(int argc, char **argv)
 
 	/*init socket's tx/rx ring
 	init pktmbuf pool per socket
-	init qos_conf info*/
+	init qos_conf info
+    configure port tx/rx
+    set tx/rx ring size
+    and start device*/
+
 	ret = app_init();
 	if (ret < 0)
 		return -1;
