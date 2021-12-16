@@ -243,4 +243,10 @@ int mp_size = NB_MBUF;
 /*load cfg_file*/
 int load_cfg_file();
 
+/*use mempool to buffer pakcet
+send packet to rx_ring
+use qos sched method
+send packet to tx_ring
+send packet to output_port*/
+
 int qos_init(void);
